@@ -1,0 +1,25 @@
+{
+  "name": "sequelize-provider",
+  "version": "1.0.0",
+  "description": "Provide Sequelize functions for use in apiQuery",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-jscs": "^4.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "gulp lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cookie-mafia/SequelizeProvider.git"
+  },
+  "author": "nakautot",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cookie-mafia/SequelizeProvider/issues"
+  },
+  "homepage": "https://github.com/cookie-mafia/SequelizeProvider#readme"
+}

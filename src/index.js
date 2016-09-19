@@ -1,19 +1,24 @@
 'use strict';
 
-function doFilter() {
-  return 'Filtering is not supported.';
+function doFilter(baseQuery, column, value) {
+  baseQuery.queryObj.where         = baseQuery.queryObj.where || {};
+  baseQuery.queryObj.where[column] = value;
+  return baseQuery;
 }
 
-function doSort() {
-  return 'Sorting is not supported.';
+function doSort(baseQuery, isASC, sortString) {
+  baseQuery.queryObj.order = baseQuery.queryObj.order || [];
+  baseQuery.queryObj.order.push([sortString, isASC ? 'ASC' : 'DESC']);
+  return baseQuery;
 }
 
-function doBatch() {
-  return 'Batch fetch is not supported.';
+function doBatch(baseQuery, offset, limit) {
+  baseQuery.queryObj = Object.assign(baseQuery.queryObj, {offset, limit});
+  return baseQuery;
 }
 
-function execute() {
-  return 'Execution is not supported.';
+function execute(baseQuery) {
+  return baseQuery.query.findAll(baseQuery.queryObj);
 }
 
 module.exports = {

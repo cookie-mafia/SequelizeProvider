@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Provide Sequelize functions for use in apiQuery",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "api-query": "^1.0.0"
+  },
   "devDependencies": {
     "codacy-coverage": "^2.0.0",
     "gulp": "^3.9.1",
@@ -13,7 +15,6 @@
     "gulp-mocha": "^3.0.1",
     "mocha-lcov-reporter": "^1.2.0",
     "should": "^11.1.0"
-
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

@@ -30,6 +30,7 @@ const test = () => {
 const preTest = () => {
   return gulp.src([
       '!src/*.test.js',
+      '!demo/*.js',
       '!src/**/*.test.js',
       'src/*.js',
       'src/**/*.js'

@@ -27,7 +27,7 @@ describe('attributes', () => {
 
 describe('actions', () => {
   it('should be able to perform execute', () => {
-    let baseQuery = {
+    let baseQuery1 = {
       'queryObj': {'pass': true},
       'query': {
         'findAll': (param) => {
@@ -35,8 +35,10 @@ describe('actions', () => {
         }
       }
     };
+    let baseQuery2 = Object.assign({}, baseQuery1, {'models': {'model1': {}}});
 
-    should(secProv.execute(baseQuery).pass).equal(true);
+    should(secProv.execute(baseQuery1).pass).equal(true);
+    should(secProv.execute(baseQuery2).pass).equal(true);
   });
 
   it('should be able to perform doBatch', () => {
@@ -63,11 +65,35 @@ describe('actions', () => {
   });
 
   it('should be able to perform doFilter', () => {
-    let baseQuery = {'queryObj': {}};
-    const key     = 'Key';
-    const value   = 'Value';
-    let query     = secProv.doFilter(baseQuery, key, value);
+    let baseQuery1 = {'queryObj': {}};
+    const key      = 'Key';
+    const multKey  = 'AssocTable.Key';
+    const value    = 'Value';
+    let query      = secProv.doFilter(baseQuery1, multKey, value);
 
     should(query.queryObj.where[key]).equal(value);
+
+    let models     = {'AssocTable': {}};
+    let baseQuery2 = Object.assign({}, baseQuery1, {models});
+
+    secProv.doFilter(baseQuery2, multKey, value);
+
+    should(baseQuery2.models.AssocTable.where[key]).equal(value);
+  });
+
+  it('should be able to package models for the provider', () => {
+    const mainModel   = 'mainModel';
+    const assocModel1 = 'assocModel1';
+    const assocModel2 = 'assocModel2';
+    const packedData  = secProv.pack(mainModel, {assocModel1, assocModel2});
+
+    should(packedData.query).equal(mainModel);
+    should(packedData.models.assocModel1.model).equal(assocModel1);
+    should(packedData.models.assocModel2.model).equal(assocModel2);
+
+    const packedData2 = secProv.pack(mainModel);
+
+    should(packedData2.query).equal(mainModel);
+    should(Object.keys(packedData2.models).length).equal(0);
   });
 });

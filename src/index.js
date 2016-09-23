@@ -20,9 +20,24 @@ function doFilter(baseQuery, column, value) {
   return baseQuery;
 }
 
-function doSort(baseQuery, isASC, sortString) {
+function performSort(baseQuery, dir, source) {
   baseQuery.queryObj.order = baseQuery.queryObj.order || [];
-  baseQuery.queryObj.order.push([sortString, isASC ? 'ASC' : 'DESC']);
+  baseQuery.queryObj.order.push(source.concat(dir));
+}
+
+function doSort(baseQuery, isASC, sortString) {
+  function determineSortString(currToken, nxtToken) {
+    return (nxtToken && baseQuery.models && baseQuery.models[nxtToken] &&
+      [baseQuery.models[nxtToken]] || []).concat([currToken]);
+  }
+
+  function prePerformSort(token, index, tokens) {
+    performSort(baseQuery, [isASC ? 'ASC' : 'DESC'],
+      determineSortString(token, tokens[index + 1]));
+    return true;
+  }
+
+  sortString.split('.').reverse().some(prePerformSort);
   return baseQuery;
 }
 
@@ -55,7 +70,7 @@ function pack(baseModel, models) {
 }
 
 module.exports = {
-  'version': '1.1.0',
+  'version': '1.2.0',
   doFilter,
   doSort,
   doBatch,

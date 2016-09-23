@@ -27,9 +27,9 @@ Animal.belongsTo(Terrain, {'foreignKey': 'typeId'});
 
 // allowed query operators, even if request params are present if operation is not allowed it will not happen
 // OPERATOR FLAGS: apiQuery.optr.SORT, apiQuery.optr.BATCH, apiQuery.optr.FILTER
-const operators = [apiQuery.optr.FILTER];
+const operators = [apiQuery.optr.SORT];
 // object representation of Request URL Parameters fetched by the service
-const requestURLParams = {'fltr_Terrain.name': 'AIR'};
+const requestURLParams = {'sort': '+Terrain.name,-name'};
 // package sequelize entities to conform to provider needs, param1=base model to query, param2=related models
 let packedData = actionProvider.pack(Animal, {Terrain});
 

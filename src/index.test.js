@@ -62,6 +62,16 @@ describe('actions', () => {
     should(query2.queryObj.order.length).equal(2);
     should(query2.queryObj.order[1][0]).equal('dummySortCol2');
     should(query2.queryObj.order[1][1]).equal('DESC');
+
+    let models     = {'AssocTable': {}};
+    let baseQuery2 = Object.assign({}, baseQuery, {models});
+    let query3     = secProv.doSort(baseQuery2, false,
+      'AssocTable.dummySortCol');
+
+    should(query3.queryObj.order.length).equal(3);
+    should(Object.keys(query3.queryObj.order[2][0]).length).equal(0);
+    should(query3.queryObj.order[2][1]).equal('dummySortCol');
+    should(query3.queryObj.order[2][2]).equal('DESC');
   });
 
   it('should be able to perform doFilter', () => {

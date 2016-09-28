@@ -1,22 +1,21 @@
 'use strict';
 
-function performFilter(baseQuery, column, value) {
-  baseQuery.where         = baseQuery.where || {};
-  baseQuery.where[column] = value;
+const seqAnd = '$and';
+const seqOr  = '$or';
+
+function doBeforeExecute(queryObj) {
+  return queryObj;
+}
+
+function checkColumn(column) {
+  let wrap = column.includes('.') ? '$' : '';
+  return wrap + column + wrap;
 }
 
 function doFilter(baseQuery, column, value) {
-  function determineQueryObj(nxtToken) {
-    return nxtToken && baseQuery.models && baseQuery.models[nxtToken] ||
-      baseQuery.queryObj;
-  }
-
-  function prePerformFilter(token, index, tokens) {
-    performFilter(determineQueryObj(tokens[index + 1]), token, value);
-    return true;
-  }
-
-  column.split('.').reverse().some(prePerformFilter);
+  baseQuery.queryObj.where = baseQuery.queryObj.where || {};
+  baseQuery.queryObj.where[seqAnd] = baseQuery.queryObj.where[seqAnd] || {};
+  baseQuery.queryObj.where[seqAnd][checkColumn(column)] = value;
   return baseQuery;
 }
 
@@ -52,21 +51,27 @@ function buildModels(prev, key) {
 }
 
 function execute(baseQuery) {
+  let options = baseQuery.options || {};
+  let wrap = options.doBeforeExecute || this.doBeforeExecute;
   let src = baseQuery.models || {};
   baseQuery.queryObj.include = Object.keys(src)
     .reduce(buildModels, {src,'dest': []}).dest;
-  return baseQuery.query.findAll(baseQuery.queryObj);
+  return baseQuery.query.findAll(wrap(baseQuery.queryObj));
 }
 
-function blowUpModels(prev, key) {
-  prev.dest[key] = {'model': prev.src[key]};
-  return prev;
-}
+function pack(baseModel, models, optionsParam) {
+  let options = optionsParam || {};
+  function blowUpModels(prev, key) {
+    prev.dest[key] = {
+      'model': prev.src[key],
+      'required': !((options.nullable || []).indexOf(key) > -1)
+    };
+    return prev;
+  }
 
-function pack(baseModel, models) {
   let src = models || [];
   let dst = Object.keys(src).reduce(blowUpModels, {src,'dest': {}});
-  return {'query': baseModel, 'models': dst.dest, 'queryObj': {}};
+  return {'query': baseModel, 'models': dst.dest, 'queryObj': {}, options};
 }
 
 module.exports = {
@@ -75,5 +80,6 @@ module.exports = {
   doSort,
   doBatch,
   execute,
-  pack
+  pack,
+  doBeforeExecute
 };

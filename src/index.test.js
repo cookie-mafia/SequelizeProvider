@@ -76,19 +76,17 @@ describe('actions', () => {
 
   it('should be able to perform doFilter', () => {
     let baseQuery1 = {'queryObj': {}};
+    const seqAnd   = '$and';
     const key      = 'Key';
     const multKey  = 'AssocTable.Key';
     const value    = 'Value';
-    let query      = secProv.doFilter(baseQuery1, multKey, value);
+    let query      = secProv.doFilter(baseQuery1, key, value);
 
-    should(query.queryObj.where[key]).equal(value);
+    should(query.queryObj.where[seqAnd][key]).equal(value);
 
-    let models     = {'AssocTable': {}};
-    let baseQuery2 = Object.assign({}, baseQuery1, {models});
+    secProv.doFilter(baseQuery1, multKey, value);
 
-    secProv.doFilter(baseQuery2, multKey, value);
-
-    should(baseQuery2.models.AssocTable.where[key]).equal(value);
+    should(query.queryObj.where[seqAnd]['$' + multKey + '$']).equal(value);
   });
 
   it('should be able to package models for the provider', () => {

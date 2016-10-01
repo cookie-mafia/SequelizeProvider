@@ -20,6 +20,10 @@ describe('attributes', () => {
     should(secProv).have.property('doBatch');
   });
 
+  it('should have doField attribute', () => {
+    should(secProv).have.property('doField');
+  });
+
   it('should have execute attribute', () => {
     should(secProv).have.property('execute');
   });
@@ -49,6 +53,32 @@ describe('actions', () => {
     should(queryObj.limit).equal(12);
   });
 
+  it('should be able to perform doField', () => {
+    let baseQuery = {'queryObj': {}, 'query': {}, 'models': {'dummyModel': {}}};
+    let query     = secProv.doField(baseQuery, 'dummyFieldCol');
+
+    should(query.queryObj.group.length).equal(1);
+
+    let baseQuery2 = {'queryObj': {}, 'query': {}};
+    let query2     = secProv.doField(baseQuery2, 'dummyFieldCol');
+    should(query2.queryObj.group.length).equal(1);
+  });
+
+  it('should be able to perform doFilter', () => {
+    let baseQuery1 = {'queryObj': {}};
+    const seqAnd   = '$and';
+    const key      = 'Key';
+    const multKey  = 'AssocTable.Key';
+    const value    = 'Value';
+    let query      = secProv.doFilter(baseQuery1, key, value);
+
+    should(query.queryObj.where[seqAnd][key]).equal(value);
+
+    secProv.doFilter(baseQuery1, multKey, value);
+
+    should(query.queryObj.where[seqAnd]['$' + multKey + '$']).equal(value);
+  });
+
   it('should be able to perform doSort', () => {
     let baseQuery = {'queryObj': {}};
     let query     = secProv.doSort(baseQuery, true, 'dummySortCol');
@@ -72,21 +102,6 @@ describe('actions', () => {
     should(Object.keys(query3.queryObj.order[2][0]).length).equal(0);
     should(query3.queryObj.order[2][1]).equal('dummySortCol');
     should(query3.queryObj.order[2][2]).equal('DESC');
-  });
-
-  it('should be able to perform doFilter', () => {
-    let baseQuery1 = {'queryObj': {}};
-    const seqAnd   = '$and';
-    const key      = 'Key';
-    const multKey  = 'AssocTable.Key';
-    const value    = 'Value';
-    let query      = secProv.doFilter(baseQuery1, key, value);
-
-    should(query.queryObj.where[seqAnd][key]).equal(value);
-
-    secProv.doFilter(baseQuery1, multKey, value);
-
-    should(query.queryObj.where[seqAnd]['$' + multKey + '$']).equal(value);
   });
 
   it('should be able to package models for the provider', () => {

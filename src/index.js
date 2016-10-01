@@ -1,7 +1,8 @@
 'use strict';
 
-const seqAnd = '$and';
-const seqOr  = '$or';
+const sequelize = require('sequelize');
+const seqAnd    = '$and';
+const seqOr     = '$or';
 
 function doBeforeExecute(queryObj) {
   return queryObj;
@@ -45,6 +46,21 @@ function doBatch(baseQuery, offset, limit) {
   return baseQuery;
 }
 
+function doField(baseQuery, fieldString) {
+  Object.keys(baseQuery.models || {}).forEach(function(key) {
+    baseQuery.models[key].attributes = [];
+  });
+  baseQuery.queryObj.group      = baseQuery.queryObj.group || [];
+  baseQuery.queryObj.attributes = baseQuery.queryObj.attributes || [[
+    sequelize.fn('json_agg', sequelize.col(baseQuery.query.name + '.id')),
+    'ids'
+  ]];
+  baseQuery.queryObj.group.push(fieldString);
+  baseQuery.queryObj.attributes.push(fieldString);
+  baseQuery.queryObj.raw = true;
+  return baseQuery;
+}
+
 function buildModels(prev, key) {
   prev.dest.push(prev.src[key]);
   return prev;
@@ -71,14 +87,20 @@ function pack(baseModel, models, optionsParam) {
 
   let src = models || [];
   let dst = Object.keys(src).reduce(blowUpModels, {src,'dest': {}});
-  return {'query': baseModel, 'models': dst.dest, 'queryObj': {}, options};
+  return {
+    'query': baseModel,
+    'models': dst.dest,
+    'queryObj': {'raw': options.valuesOnly},
+    options
+  };
 }
 
 module.exports = {
-  'version': '1.2.0',
+  'version': '1.2.1',
   doFilter,
   doSort,
   doBatch,
+  doField,
   execute,
   pack,
   doBeforeExecute

@@ -1,6 +1,6 @@
 {
   "name": "sequelize-provider",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Provide Sequelize functions for use in apiQuery",
   "main": "index.js",
   "dependencies": {

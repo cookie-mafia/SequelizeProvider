@@ -70,9 +70,10 @@ function execute(baseQuery) {
   let options = baseQuery.options || {};
   let wrap = options.doBeforeExecute || this.doBeforeExecute;
   let src = baseQuery.models || {};
+  let findMethod = options.findMethod || 'findAll';
   baseQuery.queryObj.include = Object.keys(src)
     .reduce(buildModels, {src,'dest': []}).dest;
-  return baseQuery.query.findAll(wrap(baseQuery.queryObj));
+  return baseQuery.query[findMethod](wrap(baseQuery.queryObj));
 }
 
 function pack(baseModel, models, optionsParam) {
@@ -96,7 +97,7 @@ function pack(baseModel, models, optionsParam) {
 }
 
 module.exports = {
-  'version': '1.2.1',
+  'version': '1.2.2',
   doFilter,
   doSort,
   doBatch,

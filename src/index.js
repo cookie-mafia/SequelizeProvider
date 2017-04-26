@@ -16,7 +16,7 @@ function checkColumn(column) {
 function doFilter(baseQuery, column, value) {
   baseQuery.queryObj.where = baseQuery.queryObj.where || {};
   baseQuery.queryObj.where[seqAnd] = baseQuery.queryObj.where[seqAnd] || {};
-  baseQuery.queryObj.where[seqAnd][checkColumn(column)] = value;
+  baseQuery.queryObj.where[seqAnd][checkColumn(column).split('~').join('.')] = value;
   return baseQuery;
 }
 
